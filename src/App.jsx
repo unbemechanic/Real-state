@@ -3,10 +3,12 @@ import Home from "./page/home"
 import SignIn from "./page/signIn"
 import SignOut from "./page/signOut"
 import About from "./page/about"
+import Header from "./components/header"
 
 export default function App() {
   return (
     <BrowserRouter>
+      <Header/>
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/sign-in" element={<SignIn/>} />
