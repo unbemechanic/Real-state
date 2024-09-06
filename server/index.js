@@ -1,11 +1,16 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+const express = require('express');
+const dotenv = require('dotenv').config();
+const mongoose = require('mongoose');
+const router = require('./routes/auth');
+const cors = require('cors')
 
-dotenv.config()
 
-const app = express();
+const app = express(); 
+app.use(express.json()) // to use json file in the project
+app.use(cors())
 const PORT = process.env.PORT
+
+app.use('/server',router)
 
 mongoose.connect(process.env.MONGO)
 .then(()=> {
@@ -17,3 +22,14 @@ mongoose.connect(process.env.MONGO)
 app.listen(PORT, ()=> {
     console.log(`Server is running on port ${PORT}`)
 })
+
+//middleware to handle error 
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 501;
+    const message = err.message || "Internal Error from middleware";
+    return res.status(statusCode).json({
+        success: false,
+        statusCode,
+        message,
+    });
+});
