@@ -27,7 +27,8 @@ app.listen(PORT, ()=> {
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 501;
     const message = err.message || "Internal Error from middleware";
-    return res.status(statusCode).json({
+    console.log(err)
+    res.status(statusCode).json({
         success: false,
         statusCode,
         message,
