@@ -1,10 +1,14 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { signInStart, signInFailure, signInSuccess } from '../redux/user/userSlice';
+import OAuth from '../components/OAuth';
 
 export default function SignIn() {
     const [formData, setFormData] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const { loading, error } = useSelector((state) => state.user)
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleChange = (e) => {
         setFormData({
@@ -15,8 +19,8 @@ export default function SignIn() {
     // console.log(formDatas)
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true)
         try {
+            dispatch(signInStart())
             const res = await fetch('http://localhost:5000/server/auth/sign-in', {
             method: 'POST',
             headers:{
@@ -28,16 +32,14 @@ export default function SignIn() {
         const access = data.token
         if(data.success === false){
             alert(data.message)
-            setError('Sign in failed');
-            setLoading(false);
+            dispatch(signInFailure(data.message))
             return
         }
         localStorage.setItem('token', access)
-        setLoading(false)
-        // setError(null);
+        dispatch(signInSuccess(data))
         navigate('/')
         } catch (error) {
-            setLoading(false)
+            dispatch(signInFailure(error.message))
             console.error(error)
         }
         
@@ -50,10 +52,11 @@ export default function SignIn() {
             <input type="email" placeholder='Email' id='email' className='border rounded p-3' onChange={handleChange} />
             <input type="password" placeholder='Password' id='password' className='border rounded p-3'  onChange={handleChange} />
             <button  disabled={loading} type='submit' className='uppercase bg-slate-700 text-white p-3 rounded hover:opacity-95 disabled:opacity-80 active:bg-slate-600'>{loading ? 'Loading...':'Sign in'}</button>
+            <OAuth />
         </form>
         <div className='flex gap-2 mt-5'>
             <p>Don't have an account?</p>
-            <Link to={"/register"}><span className='text-blue-700'>Sign in</span></Link>
+            <Link to={"/register"}><span className='text-blue-700'>Sign up</span></Link>
         </div>
     </div>
   )
